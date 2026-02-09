@@ -1,12 +1,12 @@
-import { prisma } from "@/lib/prisma";
+import { getPrismaClient } from "@/lib/prisma";
 import { hashPassword } from "@/lib/auth";
+import { createSessionToken, getSessionCookieConfig } from "@/lib/session";
 import { NextRequest, NextResponse } from "next/server";
 
 export async function POST(request: NextRequest) {
   try {
     const { nome, email, password } = await request.json();
 
-    // Validação básica
     if (!nome || !email || !password) {
       return NextResponse.json(
         { error: "Nome, email e senha são obrigatórios" },
@@ -21,22 +21,17 @@ export async function POST(request: NextRequest) {
       );
     }
 
-    // Verificar se usuário já existe
+    const prisma = getPrismaClient();
     const existingUser = await prisma.user.findUnique({
       where: { email },
     });
 
     if (existingUser) {
-      return NextResponse.json(
-        { error: "Email já cadastrado" },
-        { status: 400 }
-      );
+      return NextResponse.json({ error: "Email já cadastrado" }, { status: 400 });
     }
 
-    // Hash da senha
     const hashedPassword = await hashPassword(password);
 
-    // Criar usuário
     const user = await prisma.user.create({
       data: {
         nome,
@@ -47,22 +42,27 @@ export async function POST(request: NextRequest) {
         id: true,
         nome: true,
         email: true,
+        paid: true,
         createdAt: true,
       },
     });
 
-    return NextResponse.json(
+    const token = createSessionToken({ userId: user.id, email: user.email });
+    const cookie = getSessionCookieConfig();
+
+    const response = NextResponse.json(
       {
         message: "Usuário registrado com sucesso",
         user,
       },
       { status: 201 }
     );
+
+    response.cookies.set(cookie.name, token, cookie.options);
+
+    return response;
   } catch (error) {
     console.error("Erro ao registrar usuário:", error);
-    return NextResponse.json(
-      { error: "Erro ao registrar usuário" },
-      { status: 500 }
-    );
+    return NextResponse.json({ error: "Erro ao registrar usuário" }, { status: 500 });
   }
 }

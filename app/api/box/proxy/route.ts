@@ -1,16 +1,19 @@
 import { NextRequest, NextResponse } from "next/server";
-import { prisma } from "@/lib/prisma";
+import { getPrismaClient } from "@/lib/prisma";
 import Stripe from "stripe";
+import { getSessionCookieName, verifySessionToken } from "@/lib/session";
 
 export async function POST(request: NextRequest) {
   try {
-    const { userId } = await request.json();
+    const token = request.cookies.get(getSessionCookieName())?.value;
+    const sessionData = verifySessionToken(token);
 
-    if (!userId) {
-      return NextResponse.json({ error: "userId is required" }, { status: 400 });
+    if (!sessionData) {
+      return NextResponse.json({ error: "Unauthorized" }, { status: 401 });
     }
 
-    const user = await prisma.user.findUnique({ where: { id: userId } });
+    const prisma = getPrismaClient();
+    const user = await prisma.user.findUnique({ where: { id: sessionData.userId } });
 
     if (!user) {
       return NextResponse.json({ error: "User not found" }, { status: 404 });
@@ -21,7 +24,7 @@ export async function POST(request: NextRequest) {
     }
 
     const stripeSecret = process.env.STRIPE_SECRET_KEY || "";
-    const stripe = new Stripe(stripeSecret, { apiVersion: "2023-08-16" });
+    const stripe = new Stripe(stripeSecret, { apiVersion: "2026-01-28.clover" });
 
     const base = process.env.NEXT_PUBLIC_BASE_URL || "http://localhost:3000";
 
@@ -53,11 +56,15 @@ export async function POST(request: NextRequest) {
 
 export async function GET(request: NextRequest) {
   try {
-    const userId = request.nextUrl.searchParams.get("userId");
+    const token = request.cookies.get(getSessionCookieName())?.value;
+    const sessionData = verifySessionToken(token);
 
-    if (!userId) return NextResponse.json({ error: "userId required" }, { status: 400 });
+    if (!sessionData) {
+      return NextResponse.json({ error: "Unauthorized" }, { status: 401 });
+    }
 
-    const user = await prisma.user.findUnique({ where: { id: userId } });
+    const prisma = getPrismaClient();
+    const user = await prisma.user.findUnique({ where: { id: sessionData.userId } });
     if (!user) return NextResponse.json({ error: "User not found" }, { status: 404 });
 
     return NextResponse.json({ paid: !!user.paid });
