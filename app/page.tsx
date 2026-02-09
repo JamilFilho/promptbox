@@ -40,9 +40,9 @@ const Navigation = () => {
           </div>
 
           <div className="hidden md:block">
-            <button className="btn-primary-tech text-sm">
+            <a href="/box" className="btn-primary-tech text-sm">
               Comprar agora <ArrowUpRight className="w-4 h-4" />
-            </button>
+            </a>
           </div>
           
           <button 
@@ -66,9 +66,9 @@ const Navigation = () => {
           <a href="#how-it-works" onClick={() => setIsOpen(false)} className="heading-tech-md">Como funciona</a>
           <a href="#pricing" onClick={() => setIsOpen(false)} className="heading-tech-md">Preço</a>
           <a href="#faq" onClick={() => setIsOpen(false)} className="heading-tech-md">FAQ</a>
-          <button className="btn-primary-tech mt-4">
+          <a href="/box" className="btn-primary-tech mt-4">
             Comprar agora <ArrowUpRight className="w-4 h-4" />
-          </button>
+          </a>
         </div>
       )}
     </>
@@ -120,9 +120,9 @@ const HeroSection = () => {
         </p>
         
         <div className="flex flex-col sm:flex-row items-center justify-center gap-4">
-          <button className="btn-primary-tech w-full sm:w-auto">
+          <a href="/box" className="btn-primary-tech w-full sm:w-auto">
             Comprar agora <ArrowRight className="w-4 h-4" />
-          </button>
+          </a>
           <a href="#prompt-example" className="btn-outline-tech w-full sm:w-auto">
             Ver demonstração <ExternalLink className="w-4 h-4" />
           </a>
@@ -521,9 +521,9 @@ const PricingSection = () => {
             ))}
           </div>
           
-          <button className="btn-primary-tech w-full">
+          <a href="/box" className="btn-primary-tech w-full">
             Comprar agora <ArrowRight className="w-4 h-4" />
-          </button>
+          </a>
           
           <p className="text-center mt-4 text-sm text-neutral-500">
             Garantia de 7 dias. Sem perguntas.
@@ -607,9 +607,9 @@ const CTASection = () => {
         <p className="text-neutral-400 mb-10 max-w-xl mx-auto">
           Junte-se a milhares de criadores e profissionais de marketing que já economizam horas todos os dias.
         </p>
-        <button className="bg-white text-black px-8 py-4 font-medium hover:bg-neutral-200 transition-colors flex items-center gap-2 mx-auto">
+        <a href="/box" className="bg-white text-black px-8 py-4 font-medium hover:bg-neutral-200 transition-colors flex items-center gap-2 mx-auto">
           Comprar agora <ArrowRight className="w-4 h-4" />
-        </button>
+        </a>
         <p className="mono-tech mt-6">R$17,99 · Pagamento único</p>
       </div>
     </section>
