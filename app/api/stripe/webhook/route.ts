@@ -1,13 +1,13 @@
 import { NextRequest, NextResponse } from "next/server";
 import Stripe from "stripe";
-import { prisma } from "@/lib/prisma";
+import { getPrismaClient } from "@/lib/prisma";
 
 export const runtime = "edge";
 
 export async function POST(request: NextRequest) {
   const stripeSecret = process.env.STRIPE_SECRET_KEY || "";
   const webhookSecret = process.env.STRIPE_WEBHOOK_SECRET;
-  const stripe = new Stripe(stripeSecret, { apiVersion: "2023-08-16" });
+  const stripe = new Stripe(stripeSecret, { apiVersion: "2026-01-28.clover" });
 
   try {
     const buf = Buffer.from(await request.arrayBuffer());
@@ -27,6 +27,7 @@ export async function POST(request: NextRequest) {
       const userId = session.metadata?.userId as string | undefined;
 
       if (userId) {
+        const prisma = getPrismaClient();
         await prisma.user.update({
           where: { id: userId },
           data: {
